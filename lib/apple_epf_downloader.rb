@@ -1,18 +1,39 @@
 require 'net/http'
+require 'date'
 
 load 'lib/loggable.rb'
 
 class AppleEpfDownloader
   include Loggable
   
-  def download(type, filename, save_to)
-    path = [AppleEpfImporter.configuration.itunes_feed_url]
-    path.push 'incremental/current' if type.eql? 'incremental'
-    path.push filename
-    url = path.join('/')
+  def download(type, url_path)
+    url = [AppleEpfImporter.configuration.itunes_feed_url, self.get_date_file_name(type)].join('/')
     
-    start_download( url, save_to )
+    start_download( url, [AppleEpfImporter.configuration.extract_dir, File.basename( url_path )].join('/') )
   end
+  
+  # TODO: only current parsed
+  def get_date_file_name(type)
+    today = DateTime.now
+    case type
+    when 'full'
+#      if @filedate == "current"
+        days_from_wed = today.wday == 3 ? 0 : 3 - today.wday
+        day_diff = days_from_wed > 0 ? days_from_wed - 7 : days_from_wed
+        date_of_file = today + day_diff
+        'current/itunes' + date_of_file.strftime('%Y%m%d') + '.tbz'
+#      else
+#        "#{@filedate}/itunes#{@filedate}.tbz"
+#      end
+    when 'incremental'
+#      if @filedate == "current"
+        'current/incremental/current/itunes' + today.strftime('%Y%m%d') + '.tbz'
+#       else
+#         # TODO: implement this
+#         ""
+#      end 
+    end 
+  end 
   
   private
   
@@ -35,14 +56,16 @@ class AppleEpfDownloader
             res.read_body do |seg|
               f << seg
               # Sleep a bit to let the buffer top up
-              sleep 0.005
+# TODO: CHECK WITHOUT SLEEP. FASTER?
+# FASTER -> setup a buffer for lowering CPU %
+#              sleep 0.005
             end
           end
         end
       end
       logger.info 'Finished to download ' + url + ' to ' + filename
 #    rescue
-      logger.warn 'Error while downloading ' + url
+#      logger.warn 'Error while downloading ' + url
 #    end
   end
 end
