@@ -3,6 +3,8 @@ require 'tmpdir'
 load 'lib/loggable.rb'
 load 'lib/apple_epf_downloader.rb'
 load 'lib/apple_epf_extractor.rb'
+load 'lib/apple_epf_parser.rb'
+load 'lib/protocol.rb'
 
 module AppleEpfImporter
   include Loggable
@@ -22,6 +24,8 @@ module AppleEpfImporter
     attr_accessor :itunes_feed_url
     attr_accessor :extractables
     attr_accessor :extract_dir
+    attr_accessor :read_buffer_size
+    attr_accessor :read_timeout
     
     def initialize
       @apple_id = '4ppwh1rr.c0m'
@@ -30,16 +34,18 @@ module AppleEpfImporter
       @extractables = [ 'application', 'application_detail', 'application_device_type', 'artist_application', 'genre_application', 'storefront']
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/') # Will create the directories if not exists,
                                                          # And (TODO!) remove it content
+      @read_buffer_size = 32768
+      @read_timeout = 250
     end
   end
   
-  def self.get_incremental
+  def self.get_incremental(date='current')
     self.setup_directory_for_use
     
     puts 'start downloading incremental'
   
     downloader = self.downloader
-    url_path = downloader.get_date_file_name('incremental')
+    url_path = downloader.get_date_file_name( 'incremental', date )
     
     puts 'from: ' + url_path
     
@@ -51,7 +57,11 @@ module AppleEpfImporter
   end
   
   def self.extract(filename)
-    self.extractor.extract(filename)
+    self.extractor.extract( filename )
+  end
+  
+  def self.parse(filename)
+    self.parser.parse( filename )
   end
     
   # Downloader
@@ -62,6 +72,11 @@ module AppleEpfImporter
   # Extractor
   def self.extractor
     AppleEpfExtractor.new
+  end
+  
+  # Parser
+  def self.parser
+    AppleEpfParser.new
   end
   
   private 
