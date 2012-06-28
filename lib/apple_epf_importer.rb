@@ -35,23 +35,23 @@ module AppleEpfImporter
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/') # Will create the directories if not exists,
                                                          # And (TODO!) remove it content
       @read_buffer_size = 32768
-      @read_timeout = 250
+      @read_timeout = 60
     end
   end
   
   def self.get_incremental(date='current')
     self.setup_directory_for_use
     
-    puts 'start downloading incremental'
+    # puts 'start downloading incremental'
   
     downloader = self.downloader
     url_path = downloader.get_date_file_name( 'incremental', date )
     
-    puts 'from: ' + url_path
+    # puts 'from: ' + url_path
     
     downloader.download( 'incremental', url_path)
     
-    puts 'start extracting file: ' + [self.configuration.extract_dir, File.basename(url_path)].join('/')
+    # puts 'start extracting file: ' + [self.configuration.extract_dir, File.basename(url_path)].join('/')
     
     self.extract( [self.configuration.extract_dir, File.basename(url_path)].join('/') )
   end

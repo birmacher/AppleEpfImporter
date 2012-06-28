@@ -3,16 +3,14 @@ load 'lib/loggable.rb'
 class AppleEpfParser
   include Loggable
   
-  def test(filename)
-    parse( filename,
-           lambda { |header| puts header },
-           lambda { |footer| puts footer },
-           lambda { |row| puts row['name'] } )
-  end
+#   def test(filename)
+#     parse( filename,
+#            lambda { |header| puts header },
+#            lambda { |footer| puts footer },
+#            lambda { |row| puts row['name'] } )
+#   end
   
-  def parse(filename, header, footer, row)
-    puts 'Parsing ' + filename
-    
+  def parse(filename, header, footer, row)    
     # Init defaults
     @field_separator = 1.chr
     @record_separator = 2.chr + "\n"
