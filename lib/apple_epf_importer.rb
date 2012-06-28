@@ -1,13 +1,13 @@
 require 'tmpdir'
 
 module AppleEpfImporter
-  autoload 'loggable.rb'
-  autoload 'apple_epf_downloader.rb'
-  autoload 'apple_epf_extractor.rb'
-  autoload 'apple_epf_parser.rb'
-  autoload 'protocol.rb'
+#   autoload 'loggable.rb'
+#  autoload 'protocol.rb'
+  autoload :AppleEpfDownloader, 'apple_epf_importer/apple_epf_downloader'
+  autoload :AppleEpfExtractor,  'apple_epf_importer/apple_epf_extractor'
+  autoload :AppleEpfParser,     'apple_epf_importer/apple_epf_parser'
 
-  include Loggable
+#   include Loggable
   
   class << self
     attr_accessor :configuration
@@ -66,17 +66,17 @@ module AppleEpfImporter
     
   # Downloader
   def self.downloader
-    AppleEpfDownloader.new
+    AppleEpfImporter::AppleEpfDownloader.new
   end
   
   # Extractor
   def self.extractor
-    AppleEpfExtractor.new
+    AppleEpfImporter::AppleEpfExtractor.new
   end
   
   # Parser
   def self.parser
-    AppleEpfParser.new
+    AppleEpfImporter::AppleEpfParser.new
   end
   
   private 
