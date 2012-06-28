@@ -1,12 +1,12 @@
 require 'tmpdir'
 
-load 'lib/loggable.rb'
-load 'lib/apple_epf_downloader.rb'
-load 'lib/apple_epf_extractor.rb'
-load 'lib/apple_epf_parser.rb'
-load 'lib/protocol.rb'
-
 module AppleEpfImporter
+  autoload 'loggable.rb'
+  autoload 'apple_epf_downloader.rb'
+  autoload 'apple_epf_extractor.rb'
+  autoload 'apple_epf_parser.rb'
+  autoload 'protocol.rb'
+
   include Loggable
   
   class << self

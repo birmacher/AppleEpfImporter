@@ -1,8 +1,6 @@
 require 'net/http'
 require 'date'
 
-load 'lib/loggable.rb'
-
 class AppleEpfDownloader
   include Loggable
   

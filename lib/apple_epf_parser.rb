@@ -1,5 +1,3 @@
-load 'lib/loggable.rb'
-
 class AppleEpfParser
   include Loggable
   
