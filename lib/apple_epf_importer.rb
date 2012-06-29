@@ -56,11 +56,15 @@ module AppleEpfImporter
       self.configuration.extractables.each do |filename|
         self.parser.parse( [extract_path, filename].join('/'), header, row )
       end
-    
-      # tell it's finished
-      success.call( true )
+      
+      # Delete the used directory
+      FileUtils.rm_rf( extract_path )
+      
+      @success = true
     rescue
-      success.call( false )
+      @success = false
+    ensure
+      success.call( @success )
     end
   end
   
