@@ -28,8 +28,8 @@ module AppleEpfImporter
     attr_accessor :read_timeout
     
     def initialize
-      @apple_id = '4ppwh1rr.c0m'
-      @apple_password = '314ed5e5032079b6a1c501ca6a10723a'
+      @apple_id = ''
+      @apple_password = ''
       @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full'
       @extractables = [ 'application', 'application_detail', 'application_device_type', 'artist_application', 'genre_application', 'storefront']
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/') # Will create the directories if not exists,
