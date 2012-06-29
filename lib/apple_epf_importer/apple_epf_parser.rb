@@ -7,9 +7,8 @@ module AppleEpfImporter
   #            lambda { |header| puts header },
   #            lambda { |footer| puts footer },
   #            lambda { |row| puts row['name'] } )
-  #   end
-    
-    def parse(filename, header, footer, row)    
+  #   end 
+    def parse(filename, header, row)    
       # Init defaults
       @field_separator = 1.chr
       @record_separator = 2.chr + "\n"
@@ -23,11 +22,6 @@ module AppleEpfImporter
       # Header
       if header_info = load_header_info
         header.call( header_info )
-      end
-        
-      # Footer
-      if footer_info = load_footer_info
-        footer.call( footer_info )
       end
       
       # Load content
@@ -57,6 +51,10 @@ module AppleEpfImporter
     end
   
     def load_header_info    
+      # File
+      file_hash = { :file => File.basename( filename ) }
+      @header_info.merge! ( file_hash )
+    
       # Columns
       line = read_line(true)
       column_hash = { :columns => line.split( @field_separator ) }
@@ -76,6 +74,9 @@ module AppleEpfImporter
       line = read_line(true).sub!( 'exportMode:', '' )
       primary_hash = { :export_type => line.split( @field_separator ) }
       @header_info.merge! ( primary_hash )
+      
+      # Records count
+      @header_info.merge! ( load_footer_info )
     end
     
     def load_footer_info

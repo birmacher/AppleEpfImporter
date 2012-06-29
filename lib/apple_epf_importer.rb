@@ -39,21 +39,29 @@ module AppleEpfImporter
     end
   end
   
-  def self.get_incremental(date='current')
-    self.setup_directory_for_use
-    
-    # puts 'start downloading incremental'
+  def self.get_incremental(date, header, row, success)
+    begin
+      self.setup_directory_for_use
   
-    downloader = self.downloader
-    url_path = downloader.get_date_file_name( 'incremental', date )
+      # Download .tbz
+      downloader = self.downloader
+      url_path = downloader.get_date_file_name( 'incremental', date )
+      downloader.download( 'incremental', url_path)
     
-    # puts 'from: ' + url_path
+      # Extract .tbz
+      extract_path = [self.configuration.extract_dir, File.basename(url_path)].join('/')
+      self.extract( extract_path )
     
-    downloader.download( 'incremental', url_path)
+      # Parse files
+      self.configuration.extractables.each do |filename|
+        self.parser.parse( [extract_path, filename].join('/'), header, row )
+      end
     
-    # puts 'start extracting file: ' + [self.configuration.extract_dir, File.basename(url_path)].join('/')
-    
-    self.extract( [self.configuration.extract_dir, File.basename(url_path)].join('/') )
+      # tell it's finished
+      success.call( true )
+    rescue
+      success.call( false )
+    end
   end
   
   def self.extract(filename)
