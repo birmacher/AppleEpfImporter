@@ -66,7 +66,7 @@ module AppleEpfImporter
       
 #       success.call( @success )
       success.call( true )
-    end
+#     end
   end
   
   def self.extract(filename)
