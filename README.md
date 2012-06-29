@@ -1,10 +1,10 @@
-= AppleEpfImporter
+# AppleEpfImporter
 
-== Installation
+## Installation
 
     gem 'apple_epf_importer'
 
-== Download incremental
+## Download incremental
 
     AppleEpfImporter.get_incremental( 'current',
                                       lambda { |header| puts header },
