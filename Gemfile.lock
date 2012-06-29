@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    apple_epf_importer (0.2.7)
+    apple_epf_importer (0.2.8)
       rails (~> 3.2.3)
 
 GEM

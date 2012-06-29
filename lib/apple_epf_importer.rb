@@ -53,11 +53,11 @@ module AppleEpfImporter
       @extract_path = [self.configuration.extract_dir, File.basename( url_path )].join('/')
       # Clean up the directory
       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
-      self.extract( @extract_file )
+      self.extract( @extract_path )
     
       # Parse files
       self.configuration.extractables.each do |filename|
-        self.parser.parse( [@extract_path, filename].join('/'), header, row )
+        self.parser.parse( [@extract_file, filename].join('/'), header, row )
       end
       
 #       @success = true
