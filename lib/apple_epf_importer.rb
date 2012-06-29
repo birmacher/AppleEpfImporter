@@ -49,7 +49,9 @@ module AppleEpfImporter
       downloader.download( 'incremental', url_path)
     
       # Extract .tbz
-      @extract_path = [self.configuration.extract_dir, File.basename(url_path)].join('/')
+      @extract_path = [self.configuration.extract_dir, File.basename(url_path, '.tbz')].join('/')
+      # Clean up the directory
+      self.delete_directory( @extract_path )
       self.extract( @extract_path )
     
       # Parse files
@@ -62,7 +64,7 @@ module AppleEpfImporter
 #       @success = false
 #     ensure
       # Delete the used directory
-      FileUtils.rm_rf( @extract_path ) if @extract_path
+      self.delete_directory( @extract_path )
       
 #       success.call( @success )
       success.call( true )
@@ -98,5 +100,9 @@ module AppleEpfImporter
   def self.setup_directory_for_use
     FileUtils.mkpath self.configuration.extract_dir
     # Todo: empty directory
+  end
+  
+  def self.delete_directory(path)
+    FileUtils.rm_rf( path ) if path
   end
 end
