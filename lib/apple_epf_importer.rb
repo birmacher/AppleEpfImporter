@@ -50,11 +50,11 @@ module AppleEpfImporter
     
       # Extract .tbz
       @extract_path = [self.configuration.extract_dir, File.basename(url_path)].join('/')
-      self.extract( extract_path )
+      self.extract( @extract_path )
     
       # Parse files
       self.configuration.extractables.each do |filename|
-        self.parser.parse( [extract_path, filename].join('/'), header, row )
+        self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
       @success = true
@@ -62,7 +62,7 @@ module AppleEpfImporter
       @success = false
     ensure
       # Delete the used directory
-      FileUtils.rm_rf( @extract_path )
+      FileUtils.rm_rf( @extract_path ) if @extract_path
       
       success.call( @success )
     end

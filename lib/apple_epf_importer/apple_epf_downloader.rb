@@ -38,7 +38,7 @@ module AppleEpfImporter
     private
   
     def start_download(url, filename)
-#       puts 'URL: ' + url
+#        puts 'URL: ' + url
 #       puts 'File: ' + filename
     
      begin
@@ -50,7 +50,7 @@ module AppleEpfImporter
           password = AppleEpfImporter.configuration.apple_password
         
           Net::HTTP.start( uri.host, uri.port ) do |http|
-            req = http.get( uri.path )
+            req = Net::HTTP::Get.new( uri.path )
             req.basic_auth username, password
           
             http.request( req ) do |res|
