@@ -43,7 +43,8 @@ module AppleEpfImporter
     
 #      begin
         # logger.info 'Started to download ' + url
-        File.open( filename, 'w' ) do |f|
+        # http://stackoverflow.com/questions/8196325/encoding-error-when-saving-a-document-through-a-rake-task-on-rails
+        File.open( filename, 'wb' ) do |f|
           uri = URI.parse url
       
           username = AppleEpfImporter.configuration.apple_id
