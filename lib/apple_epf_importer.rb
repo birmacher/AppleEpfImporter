@@ -49,10 +49,11 @@ module AppleEpfImporter
       downloader.download( 'incremental', url_path)
     
       # Extract .tbz
-      @extract_path = [self.configuration.extract_dir, File.basename(url_path, '.tbz')].join('/')
+      @extract_file = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
+      @extract_path = [self.configuration.extract_dir, File.basename( url_path )].join('/')
       # Clean up the directory
-      self.delete_directory( @extract_path )
-      self.extract( @extract_path )
+      self.delete_directory( AppleEpfImporter.configuration.extract_dir )
+      self.extract( @extract_file )
     
       # Parse files
       self.configuration.extractables.each do |filename|
@@ -64,7 +65,7 @@ module AppleEpfImporter
 #       @success = false
 #     ensure
       # Delete the used directory
-      self.delete_directory( @extract_path )
+      self.delete_directory( AppleEpfImporter.configuration.extract_dir )
       
 #       success.call( @success )
       success.call( true )
