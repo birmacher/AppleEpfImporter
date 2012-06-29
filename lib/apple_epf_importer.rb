@@ -40,7 +40,7 @@ module AppleEpfImporter
   end
   
   def self.get_incremental(date, header, row, success)
-    begin
+#     begin
       self.setup_directory_for_use
   
       # Download .tbz
@@ -57,14 +57,15 @@ module AppleEpfImporter
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
-      @success = true
-    rescue
-      @success = false
-    ensure
+#       @success = true
+#     rescue
+#       @success = false
+#     ensure
       # Delete the used directory
       FileUtils.rm_rf( @extract_path ) if @extract_path
       
-      success.call( @success )
+#       success.call( @success )
+      success.call( true )
     end
   end
   

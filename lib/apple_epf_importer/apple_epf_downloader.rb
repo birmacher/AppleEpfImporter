@@ -41,7 +41,7 @@ module AppleEpfImporter
 #        puts 'URL: ' + url
 #       puts 'File: ' + filename
     
-     begin
+#      begin
         # logger.info 'Started to download ' + url
         File.open( filename, 'w' ) do |f|
           uri = URI.parse url
@@ -61,9 +61,9 @@ module AppleEpfImporter
           end
         end
         # logger.info 'Finished to download ' + url + ' to ' + filename
-     rescue
+#      rescue
        # logger.warn 'Error while downloading ' + url
-     end
+#      end
     end
   end
 end
