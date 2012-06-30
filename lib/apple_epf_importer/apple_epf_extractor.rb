@@ -10,6 +10,7 @@ module AppleEpfImporter
         files.push File.basename(filename, '.tbz') + '/' + f
       end
     
+      puts 'tar --extract --file=' + filename + ' -C ' + AppleEpfImporter.configuration.extract_dir + ' ' + files.join(' ')
       system 'tar --extract --file=' + filename + ' -C ' + AppleEpfImporter.configuration.extract_dir + ' ' + files.join(' ')
     end
   end

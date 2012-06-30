@@ -28,12 +28,18 @@ module AppleEpfImporter
       until !(data = load_file_data)
         row.call( data )
       end
+      
+      close_file
     end
     
     private
     
     def parse_file(filename)  
-      @file = File.new( filename, 'r', encoding: 'UTF-8' )
+      @file = File.new( filename, 'rb' )
+    end
+    
+    def close_file
+      @file.close if @file
     end
     
     def read_line(accept_comment = false)
