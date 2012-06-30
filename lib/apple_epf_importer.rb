@@ -51,31 +51,32 @@ module AppleEpfImporter
       puts "-> File downloaded"
     
       # Extract .tbz
-      @extract_file = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
-      @extract_path = [self.configuration.extract_dir, File.basename( url_path )].join('/')
+      @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
+      @extract_file = [self.configuration.extract_dir, File.basename( url_path )].join('/')
       
       puts "-> extracting file: #{@extract_file}"
       puts "-> extracting path: #{@extract_path}"
       
       # Clean up the directory
 #       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
-      self.extract( @extract_path )
+      self.extract( @extract_file )
       
       puts "-> extracted file"
     
       # Parse files
       AppleEpfImporter.configuration.extractables.each do |filename|
         puts "-> started parsing: #{filename}"
-        self.parser.parse( [@extract_file, filename].join('/'), header, row )
+        self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
 #       @success = true
 #     rescue
 #       @success = false
 #     ensure
-      # Delete the used directory
+      # Delete the used files
       puts "-> delete directory"
-#       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
+      self.delete_directory( @extract_path )
+      self.delete_file( @extract_file )
       
       puts "-> end"
 #       success.call( @success )
@@ -112,5 +113,9 @@ module AppleEpfImporter
   
   def self.delete_directory(path)
     FileUtils.rm_rf( path ) if path
+  end
+  
+  def self.delete_file(path)
+    FileUtils.rm( path ) if path
   end
 end

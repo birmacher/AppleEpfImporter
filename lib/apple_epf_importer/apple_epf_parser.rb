@@ -18,7 +18,7 @@ module AppleEpfImporter
       @filename = filename
           
       # Open file
-      parse_file @filename
+      parse_file
       
       # Header
       if header_info = load_header_info
@@ -36,7 +36,7 @@ module AppleEpfImporter
     private
     
     def parse_file
-      @file = File.new( @filename, 'rb' )
+      @file = File.new( filename, 'r', encoding: 'UTF-8' )
     end
     
     def close_file
