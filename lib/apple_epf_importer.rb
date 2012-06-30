@@ -58,7 +58,7 @@ module AppleEpfImporter
       puts "-> extracting path: #{@extract_path}"
       
       # Clean up the directory
-      self.delete_directory( AppleEpfImporter.configuration.extract_dir )
+#       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
       self.extract( @extract_path )
       
       puts "-> extracted file"
@@ -75,7 +75,7 @@ module AppleEpfImporter
 #     ensure
       # Delete the used directory
       puts "-> delete directory"
-      self.delete_directory( AppleEpfImporter.configuration.extract_dir )
+#       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
       
       puts "-> end"
 #       success.call( @success )
