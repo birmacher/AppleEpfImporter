@@ -36,7 +36,7 @@ module AppleEpfImporter
     private
     
     def parse_file
-      @file = File.new( filename, 'r', encoding: 'UTF-8' )
+      @file = File.new( @filename, 'r', encoding: 'UTF-8' )
     end
     
     def close_file
