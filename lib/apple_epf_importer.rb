@@ -14,8 +14,8 @@ module AppleEpfImporter
   end
   
   def self.configure
-    self.configuration ||= Configuration.new
-#     yield configuration
+    @configuration ||= Configuration.new
+    yield(@configuration) if block_given?
   end
   
   class Configuration
@@ -51,6 +51,10 @@ module AppleEpfImporter
       # Extract .tbz
       @extract_file = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
       @extract_path = [self.configuration.extract_dir, File.basename( url_path )].join('/')
+      
+      puts "extracting file: #{@extract_file}"
+      puts "extracting path: #{@extract_path}"
+      
       # Clean up the directory
       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
       self.extract( @extract_path )
