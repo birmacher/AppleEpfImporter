@@ -15,9 +15,10 @@ module AppleEpfImporter
       @comment_char = '#'
       @header_info = Hash.new
       @footer_info = Hash.new
+      @filename = filename
           
       # Open file
-      parse_file filename
+      parse_file @filename
       
       # Header
       if header_info = load_header_info
@@ -34,8 +35,8 @@ module AppleEpfImporter
     
     private
     
-    def parse_file(filename)  
-      @file = File.new( filename, 'rb' )
+    def parse_file
+      @file = File.new( @filename, 'rb' )
     end
     
     def close_file
@@ -58,7 +59,7 @@ module AppleEpfImporter
   
     def load_header_info    
       # File
-      file_hash = { :file => File.basename( filename ) }
+      file_hash = { :file => File.basename( @filename ) }
       @header_info.merge! ( file_hash )
     
       # Columns

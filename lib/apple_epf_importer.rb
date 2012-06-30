@@ -87,10 +87,6 @@ module AppleEpfImporter
     self.extractor.extract( filename )
   end
   
-  def self.parse(filename)
-    self.parser.parse( filename )
-  end
-    
   # Downloader
   def self.downloader
     AppleEpfImporter::AppleEpfDownloader.new

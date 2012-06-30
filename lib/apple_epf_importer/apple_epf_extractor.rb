@@ -10,8 +10,8 @@ module AppleEpfImporter
         files.push File.basename(filename, '.tbz') + '/' + f
       end
     
-      puts "tar -xjf #{filename} --directory=#{AppleEpfImporter.configuration.extract_dir} #{files.join(' ')}"
-      system "tar -xjf #{filename} --directory= #{AppleEpfImporter.configuration.extract_dir} #{files.join(' ')}"
+      puts "cd #{AppleEpfImporter.configuration.extract_dir} && tar -xjf #{filename} #{files.join(' ')}"
+      system "cd #{AppleEpfImporter.configuration.extract_dir} && tar -xjf #{filename} #{files.join(' ')}"
     end
   end
 end
