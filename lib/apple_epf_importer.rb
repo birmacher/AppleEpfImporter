@@ -40,7 +40,7 @@ module AppleEpfImporter
   end
   
   def self.get_incremental(date, header, row, success)
-#     begin
+    begin
       self.setup_directory_for_use
   
       # Download .tbz
@@ -57,8 +57,6 @@ module AppleEpfImporter
       puts "-> extracting file: #{@extract_file}"
       puts "-> extracting path: #{@extract_path}"
       
-      # Clean up the directory
-#       self.delete_directory( AppleEpfImporter.configuration.extract_dir )
       self.extract( @extract_file )
       
       puts "-> extracted file"
@@ -69,19 +67,24 @@ module AppleEpfImporter
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
-#       @success = true
-#     rescue
-#       @success = false
-#     ensure
+      @success = true
+    rescue Exception => ex
+      puts "===================="
+      puts "Exception"
+      puts ex.message
+      puts "===================="
+      puts ex.backtrace.join("\n")
+    
+      @success = false
+    ensure
       # Delete the used files
       puts "-> delete directory"
-      self.delete_directory( @extract_path )
-      self.delete_file( @extract_file )
+      self.delete_directory( @extract_path ) if @extract_path
+      self.delete_file( @extract_file ) if @extract_file
       
       puts "-> end"
-#       success.call( @success )
-      success.call( true )
-#     end
+      success.call( @success )
+    end
   end
   
   def self.extract(filename)
