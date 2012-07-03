@@ -8,11 +8,10 @@ module AppleEpfImporter
   
     def download(type, url_path)
       url = [AppleEpfImporter.configuration.itunes_feed_url, url_path].join('/')
-    
       start_download( url, [AppleEpfImporter.configuration.extract_dir, File.basename( url_path )].join('/') )
     end
   
-    # TODO: only current parsed
+    # TODO: not finished
     def get_date_file_name(type, filedate)
       today = DateTime.now
       case type
@@ -21,16 +20,20 @@ module AppleEpfImporter
          days_from_wed = today.wday == 3 ? 0 : 3 - today.wday
          day_diff = days_from_wed > 0 ? days_from_wed - 7 : days_from_wed
          date_of_file = today + day_diff
-         'current/itunes' + date_of_file.strftime('%Y%m%d') + '.tbz'
+         
+         date = date_of_file.strftime('%Y%m%d')
+         "current/itunes#{date}.tbz"
        else
-         filedate.strftime('%Y%m%d') + '/itunes' + filedate.strftime('%Y%m%d') + '.tbz'
+         date = filedate.strftime('%Y%m%d')
+         "#{date}/itunes#{date}.tbz"
        end
       when 'incremental'
        if filedate == 'current'
-         'current/incremental/current/itunes' + today.strftime('%Y%m%d') + '.tbz'
+         date = today.strftime('%Y%m%d')
+         "current/incremental/current/itunes#{date}.tbz"
        else
-#         # TODO: Not in current dir too
-         'current/incremental/current/itunes' + filedate.strftime('%Y%m%d') + '.tbz'
+          # TODO: implement
+          ""
        end 
       end 
     end 
@@ -38,36 +41,24 @@ module AppleEpfImporter
     private
   
     def start_download(url, filename)
-#        puts 'URL: ' + url
-#       puts 'File: ' + filename
-    
-#      begin
-        # logger.info 'Started to download ' + url
-        # http://stackoverflow.com/questions/8196325/encoding-error-when-saving-a-document-through-a-rake-task-on-rails
-        File.open( filename, "wb" ) do |f|
-          puts "URL: #{url}"
-          puts "Downloading file to: #{f.path}"
-          
-          uri = URI.parse url
+      # http://stackoverflow.com/questions/8196325/encoding-error-when-saving-a-document-through-a-rake-task-on-rails
+      File.open( filename, "wb" ) do |f|
+        uri = URI.parse url
       
-          username = AppleEpfImporter.configuration.apple_id
-          password = AppleEpfImporter.configuration.apple_password
+        username = AppleEpfImporter.configuration.apple_id
+        password = AppleEpfImporter.configuration.apple_password
         
-          Net::HTTP.start( uri.host, uri.port ) do |http|
-            req = Net::HTTP::Get.new( uri.path )
-            req.basic_auth username, password
+        Net::HTTP.start( uri.host, uri.port ) do |http|
+          req = Net::HTTP::Get.new( uri.path )
+          req.basic_auth username, password
           
-            http.request( req ) do |res|
-              res.read_body do |seg|
-                f << seg
-              end
+          http.request( req ) do |res|
+            res.read_body do |seg|
+              f << seg
             end
           end
         end
-        # logger.info 'Finished to download ' + url + ' to ' + filename
-#      rescue
-       # logger.warn 'Error while downloading ' + url
-#      end
+      end
     end
   end
 end
