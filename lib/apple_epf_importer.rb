@@ -106,8 +106,8 @@ module AppleEpfImporter
       puts "Info"
       puts "Type: #{type}"
       puts "URL: #{url_path}" if url_path
-      puts "Extract path: #{@extract_file}" if extract_file
-      puts "Extracted file: #{@extract_path}" if extract_path
+      puts "Extract path: #{@extract_file}" if @extract_file
+      puts "Extracted file: #{@extract_path}" if @extract_path
       puts "~~~~~~~~~~~~~~~~~~~~"
       puts ex.message
       puts "===================="
