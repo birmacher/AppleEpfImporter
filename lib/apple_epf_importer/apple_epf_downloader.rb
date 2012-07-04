@@ -4,33 +4,32 @@ require 'apple_epf_importer/protocol'
 
 module AppleEpfImporter
   class AppleEpfDownloader
-#     include Loggable
   
     def download(type, url_path)
-      url = [AppleEpfImporter.configuration.itunes_feed_url, url_path].join('/')
-      start_download( url, [AppleEpfImporter.configuration.extract_dir, File.basename( url_path )].join('/') )
+      url = [AppleEpfImporter.configuration.itunes_feed_url, url_path].join( "/" )
+      start_download( url, [AppleEpfImporter.configuration.extract_dir, File.basename( url_path )].join( "/") )
     end
   
     def get_date_file_name(type, filedate)
       today = DateTime.now
       case type
-      when 'full'
-       if filedate == 'current'
-         date = main_dir_name_by_date(today)
-         "current/itunes#{date}.tbz"
-       else
-         date = filedate.strftime('%Y%m%d')
-         "#{date}/itunes#{date}.tbz"
-       end
-      when 'incremental'
-       if filedate == 'current'
-         date = today.strftime('%Y%m%d')
-         "current/incremental/current/itunes#{date}.tbz"
-       else
-          main_date = main_dir_name_by_date(today)
-          date = filedate.strftime('%Y%m%d')
+      when "full"
+        if filedate == "current"
+          date = main_dir_name_by_date( today )
+          "current/itunes#{date}.tbz"
+        else
+          date = date_to_epf_format( filedate )
+          "#{date}/itunes#{date}.tbz"
+        end
+      when "incremental"
+        if filedate == "current"
+          date = date_to_epf_format( today )
+          "current/incremental/current/itunes#{date}.tbz"
+        else
+          main_date = main_dir_name_by_date( today )
+          date = date_to_epf_format( filedate )
           "#{main_date}/incremental/#{date}/itunes#{date}.tbz"
-       end 
+        end 
       end 
     end 
   
@@ -41,7 +40,11 @@ module AppleEpfImporter
       day_diff = days_from_wed > 0 ? days_from_wed - 7 : days_from_wed
       date_of_file = date + day_diff
          
-      date_of_file.strftime('%Y%m%d')
+      date_to_epf_format( date_of_file )
+    end
+    
+    def date_to_epf_format(date)
+      date.strftime( "%Y%m%d" )
     end
   
     def start_download(url, filename)

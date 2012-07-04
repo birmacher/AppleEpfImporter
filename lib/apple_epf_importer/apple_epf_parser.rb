@@ -1,13 +1,6 @@
 module AppleEpfImporter
   class AppleEpfParser
-  #   include Loggable
-    
-  #   def test(filename)
-  #     parse( filename,
-  #            lambda { |header| puts header },
-  #            lambda { |footer| puts footer },
-  #            lambda { |row| puts row['name'] } )
-  #   end 
+
     def parse(filename, header, row)    
       # Init defaults
       @field_separator = 1.chr

@@ -1,13 +1,9 @@
 require 'tmpdir'
 
 module AppleEpfImporter
-#   autoload 'loggable.rb'
-#  autoload 'protocol.rb'
   autoload :AppleEpfDownloader, 'apple_epf_importer/apple_epf_downloader'
   autoload :AppleEpfExtractor,  'apple_epf_importer/apple_epf_extractor'
   autoload :AppleEpfParser,     'apple_epf_importer/apple_epf_parser'
-
-#   include Loggable
   
   class << self
     attr_accessor :configuration
@@ -48,22 +44,14 @@ module AppleEpfImporter
       url_path = downloader.get_date_file_name( 'incremental', date )
       downloader.download( 'incremental', url_path)
       
-      puts "-> File downloaded"
-    
       # Extract .tbz
       @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
       @extract_file = [self.configuration.extract_dir, File.basename( url_path )].join('/')
       
-      puts "-> extracting file: #{@extract_file}"
-      puts "-> extracting path: #{@extract_path}"
-      
       self.extract( @extract_file )
       
-      puts "-> extracted file"
-    
       # Parse files
       AppleEpfImporter.configuration.extractables.each do |filename|
-        puts "-> started parsing: #{filename}"
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
@@ -71,6 +59,12 @@ module AppleEpfImporter
     rescue Exception => ex
       puts "===================="
       puts "Exception"
+      puts "~~~~~~~~~~~~~~~~~~~~"
+      puts "Info"
+      puts "URL: #{url_path}" if url_path
+      puts "Extract path: #{@extract_file}" if extract_file
+      puts "Extracted file: #{@extract_path}" if extract_path
+      puts "~~~~~~~~~~~~~~~~~~~~"
       puts ex.message
       puts "===================="
       puts ex.backtrace.join("\n")
@@ -78,11 +72,9 @@ module AppleEpfImporter
       @success = false
     ensure
       # Delete the used files
-      puts "-> delete directory"
       self.delete_directory( @extract_path ) if @extract_path
       self.delete_file( @extract_file ) if @extract_file
       
-      puts "-> end"
       success.call( @success )
     end
   end
@@ -111,7 +103,6 @@ module AppleEpfImporter
   # Directory
   def self.setup_directory_for_use
     FileUtils.mkpath self.configuration.extract_dir
-    # Todo: empty directory
   end
   
   def self.delete_directory(path)
