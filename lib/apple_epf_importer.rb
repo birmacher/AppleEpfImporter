@@ -35,14 +35,57 @@ module AppleEpfImporter
     end
   end
   
+  def self.get_full_version(date, header, row, success)
+    download_type( "full", date, header, row, success )
+  end
+  
   def self.get_incremental(date, header, row, success)
+    download_type( "incremental", date, header, row, success )
+  end
+  
+  # Downloader
+  def self.downloader
+    AppleEpfImporter::AppleEpfDownloader.new
+  end
+  
+  # Extractor
+  def self.extractor
+    AppleEpfImporter::AppleEpfExtractor.new
+  end
+  
+  # Parser
+  def self.parser
+    AppleEpfImporter::AppleEpfParser.new
+  end
+  
+  private
+  
+  def self.extract(filename)
+    self.extractor.extract( filename )
+  end
+  
+  # Directory
+  def self.setup_directory_for_use
+    FileUtils.mkpath self.configuration.extract_dir
+  end
+  
+  def self.delete_directory(path)
+    FileUtils.rm_rf( path ) if path
+  end
+  
+  def self.delete_file(path)
+    FileUtils.rm( path ) if path
+  end
+  
+  # Download
+  def self.download_type(type, date, header, row, success)
     begin
       self.setup_directory_for_use
   
       # Download .tbz
       downloader = self.downloader
-      url_path = downloader.get_date_file_name( 'incremental', date )
-      downloader.download( 'incremental', url_path)
+      url_path = downloader.get_date_file_name( type, date )
+      downloader.download( type, url_path)
       
       # Extract .tbz
       @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
@@ -61,6 +104,7 @@ module AppleEpfImporter
       puts "Exception"
       puts "~~~~~~~~~~~~~~~~~~~~"
       puts "Info"
+      puts "Type: #{type}"
       puts "URL: #{url_path}" if url_path
       puts "Extract path: #{@extract_file}" if extract_file
       puts "Extracted file: #{@extract_path}" if extract_path
@@ -77,39 +121,5 @@ module AppleEpfImporter
       
       success.call( @success )
     end
-  end
-  
-  def self.extract(filename)
-    self.extractor.extract( filename )
-  end
-  
-  # Downloader
-  def self.downloader
-    AppleEpfImporter::AppleEpfDownloader.new
-  end
-  
-  # Extractor
-  def self.extractor
-    AppleEpfImporter::AppleEpfExtractor.new
-  end
-  
-  # Parser
-  def self.parser
-    AppleEpfImporter::AppleEpfParser.new
-  end
-  
-  private 
-  
-  # Directory
-  def self.setup_directory_for_use
-    FileUtils.mkpath self.configuration.extract_dir
-  end
-  
-  def self.delete_directory(path)
-    FileUtils.rm_rf( path ) if path
-  end
-  
-  def self.delete_file(path)
-    FileUtils.rm( path ) if path
   end
 end
