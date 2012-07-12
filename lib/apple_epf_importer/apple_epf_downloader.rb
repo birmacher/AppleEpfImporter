@@ -14,11 +14,12 @@ module AppleEpfImporter
       today = DateTime.now
       case type
       when "full"
+        # Tar created on every Wednesday
         if filedate == "current"
           date = main_dir_name_by_date( today )
           "current/itunes#{date}.tbz"
         else
-          date = date_to_epf_format( filedate )
+          date = main_dir_name_by_date( filedate )
           "#{date}/itunes#{date}.tbz"
         end
       when "incremental"
