@@ -24,12 +24,11 @@ module AppleEpfImporter
     attr_accessor :read_timeout
     
     def initialize
-      @apple_id = ''
-      @apple_password = ''
-      @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full'
-      @extractables = [ 'application', 'application_detail', 'application_device_type', 'artist_application', 'genre_application', 'storefront']
-      @extract_dir = [Dir.tmpdir, 'epm_files'].join('/') # Will create the directories if not exists,
-                                                         # And (TODO!) remove it content
+      @apple_id = ''                                                       # Username
+      @apple_password = ''                                                 # Password
+      @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
+      @extractables = []                                                   # Nothing to extract
+      @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
       @read_buffer_size = 32768
       @read_timeout = 60
     end
@@ -99,6 +98,7 @@ module AppleEpfImporter
       end
       
       @success = true
+    # Todo: Don't just for testing
     rescue Exception => ex
       puts "===================="
       puts "Exception"

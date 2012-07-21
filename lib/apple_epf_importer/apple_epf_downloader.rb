@@ -27,7 +27,7 @@ module AppleEpfImporter
           date = date_to_epf_format( today )
           "current/incremental/current/itunes#{date}.tbz"
         else
-          main_date = main_dir_name_by_date( today )
+          main_date = main_dir_name_by_date( today, true )
           date = date_to_epf_format( filedate )
           "#{main_date}/incremental/#{date}/itunes#{date}.tbz"
         end 
@@ -36,10 +36,11 @@ module AppleEpfImporter
   
     private
     
-    def main_dir_name_by_date(date)
+    def main_dir_name_by_date(date, inc=false)
       days_from_wed = date.wday == 3 ? 0 : 3 - date.wday
       day_diff = days_from_wed > 0 ? days_from_wed - 7 : days_from_wed
       date_of_file = date + day_diff
+      date_of_file -= 7 if inc && date_of_file.to_date == date.to_date # The incremental file is stored in the previous dir...
          
       date_to_epf_format( date_of_file )
     end
