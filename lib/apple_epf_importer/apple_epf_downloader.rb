@@ -27,7 +27,7 @@ module AppleEpfImporter
           date = date_to_epf_format( today )
           "current/incremental/current/itunes#{date}.tbz"
         else
-          main_date = main_dir_name_by_date( today, true )
+          main_date = main_dir_name_by_date( filedate, true )
           date = date_to_epf_format( filedate )
           "#{main_date}/incremental/#{date}/itunes#{date}.tbz"
         end 
