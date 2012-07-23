@@ -10,26 +10,26 @@ module AppleEpfImporter
       start_download( url, [AppleEpfImporter.configuration.extract_dir, File.basename( url_path )].join( "/") )
     end
   
-    def get_date_file_name(type, filedate)
+    def get_date_file_name(type, file, filedate)
       today = DateTime.now
       case type
       when "full"
         # Tar created on every Wednesday
         if filedate == "current"
           date = main_dir_name_by_date( today )
-          "current/itunes#{date}.tbz"
+          "current/#{file}#{date}.tbz"
         else
           date = main_dir_name_by_date( filedate )
-          "#{date}/itunes#{date}.tbz"
+          "#{date}/#{file}#{date}.tbz"
         end
       when "incremental"
         if filedate == "current"
           date = date_to_epf_format( today )
-          "current/incremental/current/itunes#{date}.tbz"
+          "current/incremental/current/#{file}#{date}.tbz"
         else
           main_date = main_dir_name_by_date( filedate, true )
           date = date_to_epf_format( filedate )
-          "#{main_date}/incremental/#{date}/itunes#{date}.tbz"
+          "#{main_date}/incremental/#{date}/#{file}#{date}.tbz"
         end 
       end 
     end 

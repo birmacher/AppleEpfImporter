@@ -18,6 +18,7 @@ module AppleEpfImporter
     attr_accessor :apple_id
     attr_accessor :apple_password
     attr_accessor :itunes_feed_url
+    attr_accessor :itunes_files
     attr_accessor :extractables
     attr_accessor :extract_dir
     attr_accessor :read_buffer_size
@@ -27,7 +28,9 @@ module AppleEpfImporter
       @apple_id = ''                                                       # Username
       @apple_password = ''                                                 # Password
       @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
-      @extractables = []                                                   # Nothing to extract
+      @itunes_files = []                                                   # Tar prefix to download (itunes, popularity,  ...)
+      @extractables = []                                                   # Files to extract from the tar
+                                                                           # multi-dimensional array if needed
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
       @read_buffer_size = 32768
       @read_timeout = 60
@@ -35,11 +38,15 @@ module AppleEpfImporter
   end
   
   def self.get_full_version(date, header, row, success)
-    download_type( "full", date, header, row, success )
+    AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
+      download( "full", file, index, date, header, row, success )
+    end
   end
   
   def self.get_incremental(date, header, row, success)
-    download_type( "incremental", date, header, row, success )
+    AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
+      download( "incremental", file, index, date, header, row, success )
+    end
   end
   
   # Downloader
@@ -59,8 +66,13 @@ module AppleEpfImporter
   
   private
   
+  def self.download(type, file, index, date, header, row, success)
+    @files_to_parse = AppleEpfImporter.configuration.extractables.at( index )
+    download_type( type, file, date, header, row, success )
+  end
+  
   def self.extract(filename)
-    self.extractor.extract( filename )
+    self.extractor.extract( filename, @files_to_parse )
   end
   
   # Directory
@@ -77,13 +89,13 @@ module AppleEpfImporter
   end
   
   # Download
-  def self.download_type(type, date, header, row, success)
+  def self.download_type(type, file, date, header, row, success)
     begin
       self.setup_directory_for_use
   
       # Download .tbz
       downloader = self.downloader
-      url_path = downloader.get_date_file_name( type, date )
+      url_path = downloader.get_date_file_name( type, file, date )
       downloader.download( type, url_path)
       
       # Extract .tbz
@@ -93,7 +105,7 @@ module AppleEpfImporter
       self.extract( @extract_file )
       
       # Parse files
-      AppleEpfImporter.configuration.extractables.each do |filename|
+      @files_to_parse.each do |filename|
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
