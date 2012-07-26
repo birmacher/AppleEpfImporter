@@ -25,11 +25,11 @@ module AppleEpfImporter
     attr_accessor :read_timeout
     
     def initialize
-      @apple_id = ''                                                       # Username
-      @apple_password = ''                                                 # Password
+      @apple_id = '4ppwh1rr.c0m'                                                       # Username
+      @apple_password = '314ed5e5032079b6a1c501ca6a10723a'                                                 # Password
       @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
-      @itunes_files = []                                                   # Tar prefix to download (itunes, popularity,  ...)
-      @extractables = []                                                   # Files to extract from the tar
+      @itunes_files = [ 'popularity']                                                   # Tar prefix to download (itunes, popularity,  ...)
+      @extractables = [ [ 'application_popularity_per_genre' ] ]                                                   # Files to extract from the tar
                                                                            # multi-dimensional array if needed
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
       @read_buffer_size = 32768
@@ -38,15 +38,27 @@ module AppleEpfImporter
   end
   
   def self.get_full_version(date, header, row, success)
+    @success = true
+    
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
-      download( "full", file, index, date, header, row, success )
+      download( "full", file, index, date, header, row )
+      
+      break unless @success
     end
+    
+    success.call( @success )
   end
   
   def self.get_incremental(date, header, row, success)
+    @success = true
+    
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
-      download( "incremental", file, index, date, header, row, success )
+      download( "incremental", file, index, date, header, row )
+      
+      break unless @success
     end
+    
+    success.call( @success )
   end
   
   # Downloader
@@ -66,9 +78,9 @@ module AppleEpfImporter
   
   private
   
-  def self.download(type, file, index, date, header, row, success)
+  def self.download(type, file, index, date, header, row)
     @files_to_parse = AppleEpfImporter.configuration.extractables.at( index )
-    download_type( type, file, date, header, row, success )
+    download_type( type, file, date, header, row )
   end
   
   def self.extract(filename)
@@ -89,7 +101,7 @@ module AppleEpfImporter
   end
   
   # Download
-  def self.download_type(type, file, date, header, row, success)
+  def self.download_type(type, file, date, header, row)
     begin
       self.setup_directory_for_use
   
@@ -109,7 +121,6 @@ module AppleEpfImporter
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
-      @success = true
     # Todo: Don't just for testing
     rescue Exception => ex
       puts "===================="
@@ -130,8 +141,6 @@ module AppleEpfImporter
       # Delete the used files
       self.delete_directory( @extract_path ) if @extract_path
       self.delete_file( @extract_file ) if @extract_file
-      
-      success.call( @success )
     end
   end
 end
