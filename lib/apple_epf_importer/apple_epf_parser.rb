@@ -13,17 +13,30 @@ module AppleEpfImporter
       # Open file
       parse_file
       
-      # Header
+      # Header & footer
       if header_info = load_header_info
         header.call( header_info )
+        
+        @header_info.clear
+        @header_info = nil
+        @footer_info.clear
+        @footer_info = nil
       end
       
       # Load content
       until !(data = load_file_data)
         row.call( data )
+        
+        row.clear
+        row = nil
       end
       
       close_file
+      
+      @field_separator = nil
+      @record_separator = nil
+      @comment_char = nil
+      @filename = nil
     end
     
     private

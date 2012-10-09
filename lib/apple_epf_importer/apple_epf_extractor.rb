@@ -8,6 +8,10 @@ module AppleEpfImporter
       end
     
       system "cd #{AppleEpfImporter.configuration.extract_dir} && tar -xjf #{filename} #{files.join(' ')}"
+      
+      # clean up
+      files.clear
+      files = nil
     end
   end
 end

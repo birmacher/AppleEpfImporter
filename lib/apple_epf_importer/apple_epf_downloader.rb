@@ -31,7 +31,7 @@ module AppleEpfImporter
           date = date_to_epf_format( filedate )
           "#{main_date}/incremental/#{date}/#{file}#{date}.tbz"
         end 
-      end 
+      end
     end 
   
     private

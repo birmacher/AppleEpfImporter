@@ -25,11 +25,11 @@ module AppleEpfImporter
     attr_accessor :read_timeout
     
     def initialize
-      @apple_id = '4ppwh1rr.c0m'                                                       # Username
-      @apple_password = '314ed5e5032079b6a1c501ca6a10723a'                                                 # Password
+      @apple_id = '4ppwh1rr.c0m'                                           # Username
+      @apple_password = '314ed5e5032079b6a1c501ca6a10723a'                 # Password
       @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
-      @itunes_files = [ 'popularity']                                                   # Tar prefix to download (itunes, popularity,  ...)
-      @extractables = [ [ 'application_popularity_per_genre' ] ]                                                   # Files to extract from the tar
+      @itunes_files = [ 'popularity']                                      # Tar prefix to download (itunes, popularity,  ...)
+      @extractables = [ [ 'application_popularity_per_genre' ] ]           # Files to extract from the tar
                                                                            # multi-dimensional array if needed
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
       @read_buffer_size = 32768
