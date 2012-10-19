@@ -21,8 +21,6 @@ module AppleEpfImporter
     attr_accessor :itunes_files
     attr_accessor :extractables
     attr_accessor :extract_dir
-    attr_accessor :read_buffer_size
-    attr_accessor :read_timeout
     
     def initialize
       @apple_id = '4ppwh1rr.c0m'                                           # Username
@@ -32,8 +30,6 @@ module AppleEpfImporter
       @extractables = [ [ 'application_popularity_per_genre' ] ]           # Files to extract from the tar
                                                                            # multi-dimensional array if needed
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
-      @read_buffer_size = 32768
-      @read_timeout = 60
     end
   end
   

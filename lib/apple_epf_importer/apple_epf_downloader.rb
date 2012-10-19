@@ -1,6 +1,5 @@
 require 'net/http'
 require 'date'
-require 'apple_epf_importer/protocol'
 
 module AppleEpfImporter
   class AppleEpfDownloader
@@ -50,23 +49,16 @@ module AppleEpfImporter
     end
   
     def start_download(url, filename)
-      # http://stackoverflow.com/questions/8196325/encoding-error-when-saving-a-document-through-a-rake-task-on-rails
-      File.open( filename, "wb" ) do |f|
-        uri = URI.parse url
+      curl = Curl::Easy.new( url )
       
-        username = AppleEpfImporter.configuration.apple_id
-        password = AppleEpfImporter.configuration.apple_password
-        
-        Net::HTTP.start( uri.host, uri.port ) do |http|
-          req = Net::HTTP::Get.new( uri.path )
-          req.basic_auth username, password
-          
-          http.request( req ) do |res|
-            res.read_body do |seg|
-              f << seg
-            end
-          end
-        end
+      # Authentication
+      curl.http_auth_types = :basic
+      curl.username = AppleEpfImporter.configuration.apple_id
+      curl.password = AppleEpfImporter.configuration.apple_password
+      
+      File.open(filename, 'wb') do |f|
+        curl.on_body { |data| f << data; }   
+        curl.perform
       end
     end
   end
