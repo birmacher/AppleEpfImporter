@@ -1,5 +1,6 @@
 require 'net/http'
 require 'date'
+require 'curb'
 
 module AppleEpfImporter
   class AppleEpfDownloader
