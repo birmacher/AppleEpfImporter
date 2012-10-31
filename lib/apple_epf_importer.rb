@@ -23,8 +23,8 @@ module AppleEpfImporter
     attr_accessor :extract_dir
     
     def initialize
-      @apple_id = '4ppwh1rr.c0m'                                           # Username
-      @apple_password = '314ed5e5032079b6a1c501ca6a10723a'                 # Password
+      @apple_id = ''                                                       # Username
+      @apple_password = ''                                                 # Password
       @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
       @itunes_files = [ 'popularity']                                      # Tar prefix to download (itunes, popularity,  ...)
       @extractables = [ [ 'application_popularity_per_genre' ] ]           # Files to extract from the tar
@@ -33,8 +33,14 @@ module AppleEpfImporter
     end
   end
   
+  # Start to download full EPF import
+  # date - export date of EPF file
+  # header - header block
+  # row - row block
+  # success - success block
   def self.get_full_version(date, header, row, success)
     @success = true
+    @exception = Hash.new
     
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
       download( "full", file, index, date, header, row )
@@ -42,14 +48,31 @@ module AppleEpfImporter
       break unless @success
     end
     
-    success.call( @success )
+    self.finished( success )
   end
-  
+
+  # Start to download inremental EPF import
+  # date - export date of EPF file
+  # header - header block
+  # row - row block
+  # success - success block  
   def self.get_incremental(date, header, row, success)
     @success = true
     
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
       download( "incremental", file, index, date, header, row )
+      
+      break unless @success
+    end
+    
+    success.call( @success )
+  end
+  
+  def self.get_file(path, header, row, success)
+    @success = true
+    
+    AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
+      download( "file", file, index, date, header, row )
       
       break unless @success
     end
@@ -104,7 +127,7 @@ module AppleEpfImporter
       # Download .tbz
       downloader = self.downloader
       url_path = downloader.get_date_file_name( type, file, date )
-      downloader.download( type, url_path)
+      downloader.download( url_path)
       
       # Extract .tbz
       @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
@@ -119,6 +142,13 @@ module AppleEpfImporter
       
     # Todo: Don't just for testing
     rescue Exception => ex
+      @exception[ :epf_type ] = type
+      @exception[ :epf_url ] = url_path if url_path
+      @exception[ :extracted_path ] = extract_file if extract_file
+      @exception[ :extracted_file ] = extract_path if extract_path
+      @exception[ :exception_message ] = ex.message
+      @exception[ :exception_backtrace ] = ex.backtrace.join("\n")
+    
       puts "===================="
       puts "Exception"
       puts "~~~~~~~~~~~~~~~~~~~~"
@@ -138,5 +168,9 @@ module AppleEpfImporter
       self.delete_directory( @extract_path ) if @extract_path
       self.delete_file( @extract_file ) if @extract_file
     end
+  end
+  
+  def finished(callback)
+    callback.call( { :success => @success, :exception => @exception } )
   end
 end

@@ -5,9 +5,10 @@ require 'curb'
 module AppleEpfImporter
   class AppleEpfDownloader
   
-    def download(type, url_path)
-      url = [AppleEpfImporter.configuration.itunes_feed_url, url_path].join( "/" )
-      start_download( url, [AppleEpfImporter.configuration.extract_dir, File.basename( url_path )].join( "/") )
+    def download(url_path)
+      url = File.join( AppleEpfImporter.configuration.itunes_feed_url, url_path )
+      download_to = File.join( AppleEpfImporter.configuration.extract_dir, File.basename( url_path ) )
+      start_download( url, download_to )
     end
   
     def get_date_file_name(type, file, filedate)
@@ -30,7 +31,10 @@ module AppleEpfImporter
           main_date = main_dir_name_by_date( filedate, true )
           date = date_to_epf_format( filedate )
           "#{main_date}/incremental/#{date}/#{file}#{date}.tbz"
-        end 
+        end
+      when "file"
+        date = date_to_epf_format( filedate )
+        "#{file}#{date}.tbz"
       end
     end 
   
