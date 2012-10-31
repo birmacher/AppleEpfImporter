@@ -68,7 +68,7 @@ module AppleEpfImporter
     success.call( @success )
   end
   
-  def self.get_file(path, header, row, success)
+  def self.get_file(date, header, row, success)
     @success = true
     
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
