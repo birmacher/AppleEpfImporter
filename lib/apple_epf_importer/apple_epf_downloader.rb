@@ -8,6 +8,10 @@ module AppleEpfImporter
     def download(url_path)
       url = File.join( AppleEpfImporter.configuration.itunes_feed_url, url_path )
       download_to = File.join( AppleEpfImporter.configuration.extract_dir, File.basename( url_path ) )
+      
+      p "Download file: #{url}"
+      p "Download to: #{download_to}"
+      
       start_download( url, download_to )
     end
   
@@ -54,16 +58,23 @@ module AppleEpfImporter
     end
   
     def start_download(url, filename)
-      curl = Curl::Easy.new( url )
-      
-      # Authentication
-      curl.http_auth_types = :basic
-      curl.username = AppleEpfImporter.configuration.apple_id
-      curl.password = AppleEpfImporter.configuration.apple_password
-      
-      File.open(filename, 'wb') do |f|
-        curl.on_body { |data| f << data; }   
-        curl.perform
+      begin
+        curl = Curl::Easy.new( url )
+        
+        # Authentication
+        curl.http_auth_types = :basic
+        curl.username = AppleEpfImporter.configuration.apple_id
+        curl.password = AppleEpfImporter.configuration.apple_password
+        
+        File.open(filename, 'wb') do |f|
+          curl.on_body { |data| f << data; }   
+          curl.perform
+        end
+      rescue Exception => ex
+        # Allow Curl::Err::PartialFileError
+        unless ex.eql? Curl::Err::PartialFileError
+          raise ex
+        end
       end
     end
   end

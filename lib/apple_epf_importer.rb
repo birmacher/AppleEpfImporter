@@ -40,7 +40,7 @@ module AppleEpfImporter
   # success - success block
   def self.get_full_version(date, header, row, success)
     @success = true
-    @exception = Hash.new
+    @exception = Array.new
     
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
       download( "full", file, index, date, header, row )
@@ -65,7 +65,7 @@ module AppleEpfImporter
       break unless @success
     end
     
-    success.call( @success )
+    self.finished( success )
   end
   
   def self.get_file(date, header, row, success)
@@ -77,7 +77,7 @@ module AppleEpfImporter
       break unless @success
     end
     
-    success.call( @success )
+    self.finished( success )
   end
   
   # Downloader
@@ -127,27 +127,39 @@ module AppleEpfImporter
       # Download .tbz
       downloader = self.downloader
       url_path = downloader.get_date_file_name( type, file, date )
+      
+      p "Download file: #{url_path}"
+      p "Download started: #{DateTime.now}"
+      
       downloader.download( url_path)
+      
+      p "Extract started: #{DateTime.now}"
       
       # Extract .tbz
       @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
       @extract_file = [self.configuration.extract_dir, File.basename( url_path )].join('/')
       
       self.extract( @extract_file )
+
+      p "Parse started: #{DateTime.now}"
       
       # Parse files
       @files_to_parse.each do |filename|
+        p "Parsing file #{filename} started: #{DateTime.now}"
+      
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
+      p "Parse finished: #{DateTime.now}"
+      
     # Todo: Don't just for testing
     rescue Exception => ex
-      @exception[ :epf_type ] = type
-      @exception[ :epf_url ] = url_path if url_path
-      @exception[ :extracted_path ] = extract_file if extract_file
-      @exception[ :extracted_file ] = extract_path if extract_path
-      @exception[ :exception_message ] = ex.message
-      @exception[ :exception_backtrace ] = ex.backtrace.join("\n")
+#       @exception[ :epf_type ] = type
+#       @exception[ :epf_url ] = url_path if url_path
+#       @exception[ :extracted_path ] = extract_file if extract_file
+#       @exception[ :extracted_file ] = extract_path if extract_path
+#       @exception[ :exception_message ] = ex.message
+#       @exception[ :exception_backtrace ] = ex.backtrace.join("\n")
     
       puts "===================="
       puts "Exception"
@@ -170,7 +182,7 @@ module AppleEpfImporter
     end
   end
   
-  def finished(callback)
+  def self.finished(callback)
     callback.call( { :success => @success, :exception => @exception } )
   end
 end
