@@ -17,8 +17,17 @@ module AppleEpfImporter
       close_file
 
       File.foreach( @filename ) do |line|
-        unless line[0].chr == '#'
-          row.call( line.chomp!( @record_separator ).split( @field_separator ) )
+        unless line[0].chr == @comment_char
+          line = line.chomp( @record_separator )
+          fields = line.split( @field_separator )
+          
+          row_hash = Hash.new
+          fields.each_with_index do |data, index|
+            data_hash = { @header_info[:columns][index] => data }
+            row_hash.merge! ( data_hash )
+          end
+          
+          row.call( row_hash )
         end
       end
       
