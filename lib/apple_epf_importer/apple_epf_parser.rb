@@ -1,6 +1,5 @@
 module AppleEpfImporter
   class AppleEpfParser
-
     def parse(filename, header, row)    
       # Init defaults
       @field_separator = 1.chr
@@ -9,24 +8,19 @@ module AppleEpfImporter
       @header_info = Hash.new
       @footer_info = Hash.new
       @filename = filename
-          
-      # Open file
-      parse_file
       
+      parse_file
       # Header & footer
       if load_header_info
         header.call( @header_info )
       end
-      
-      # Load content
-      until !(data = load_file_data)
-        row.call( data )
-        
-        data.clear
-        data = nil
-      end
-      
       close_file
+
+      File.foreach( @filename ) do |line|
+        unless line[0].chr == '#'
+          row.call( line.chomp!( @record_separator ).split( @field_separator ) )
+        end
+      end
       
       @field_separator = nil
       @record_separator = nil
@@ -113,5 +107,6 @@ module AppleEpfImporter
       end
       row
     end
+    
   end
 end
