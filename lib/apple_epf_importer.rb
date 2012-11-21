@@ -1,4 +1,7 @@
 require 'tmpdir'
+require_relative 'apple_epf_importer/apple_epf_downloader'
+require_relative 'apple_epf_importer/apple_epf_extractor'
+require_relative 'apple_epf_importer/apple_epf_parser'
 
 module AppleEpfImporter
   autoload :AppleEpfDownloader, 'apple_epf_importer/apple_epf_downloader'
@@ -67,6 +70,20 @@ module AppleEpfImporter
     
     self.finished( success )
   end
+
+  #
+  # [TEST]
+  def self.test_parse_incremental(date, header, row, success)
+    @success = true
+    
+    AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
+      test_parse( "incremental", file, index, date, header, row )
+      
+      break unless @success
+    end
+    
+    self.finished( success )
+  end
   
   def self.get_file(date, header, row, success)
     @success = true
@@ -101,6 +118,13 @@ module AppleEpfImporter
     @files_to_parse = AppleEpfImporter.configuration.extractables.at( index )
     download_type( type, file, date, header, row )
   end
+
+  #
+  # [TEST]
+  def self.test_parse(type, file, index, date, header, row)
+    @files_to_parse = AppleEpfImporter.configuration.extractables.at( index )
+    test_parse_type( type, file, date, header, row )
+  end
   
   def self.extract(filename)
     self.extractor.extract( filename, @files_to_parse )
@@ -119,7 +143,8 @@ module AppleEpfImporter
     FileUtils.rm( path ) if path
   end
   
-  # Download
+  #
+  # Download, extract, parse, cleanup
   def self.download_type(type, file, date, header, row)
     begin
       self.setup_directory_for_use
@@ -141,7 +166,7 @@ module AppleEpfImporter
       
       self.extract( @extract_file )
 
-      p "Parse started: #{DateTime.now}"
+      p "- Parse started: #{DateTime.now}"
       
       # Parse files
       @files_to_parse.each do |filename|
@@ -150,7 +175,7 @@ module AppleEpfImporter
         self.parser.parse( [@extract_path, filename].join('/'), header, row )
       end
       
-      p "Parse finished: #{DateTime.now}"
+      p "- Parse finished: #{DateTime.now}"
       
     # Todo: Don't just for testing
     rescue Exception => ex
@@ -179,6 +204,62 @@ module AppleEpfImporter
       # Delete the used files
       self.delete_directory( @extract_path ) if @extract_path
       self.delete_file( @extract_file ) if @extract_file
+    end
+  end
+
+  #
+  # Parse without download and extract (for testing)
+  # [TEST]
+  def self.test_parse_type(type, file, date, header, row)
+    begin
+      # self.setup_directory_for_use
+  
+      # # Download .tbz
+      # downloader = self.downloader
+      url_path = downloader.get_date_file_name( type, file, date )
+      
+      # p "Download file: #{url_path}"
+      # p "Download started: #{DateTime.now}"
+      
+      # downloader.download( url_path)
+      
+      # p "Extract started: #{DateTime.now}"
+      
+      # # Extract .tbz
+      @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
+      # @extract_file = [self.configuration.extract_dir, File.basename( url_path )].join('/')
+      
+      # self.extract( @extract_file )
+
+      p "- Parse started: #{DateTime.now}"
+      
+      # Parse files
+      @files_to_parse.each do |filename|
+        p "Parsing file #{filename} started: #{DateTime.now}"
+      
+        self.parser.parse( [@extract_path, filename].join('/'), header, row )
+      end
+      
+      p "- Parse finished: #{DateTime.now}"
+      
+    # Todo: Don't just for testing
+    rescue Exception => ex    
+      puts "===================="
+      puts "Exception"
+      puts "~~~~~~~~~~~~~~~~~~~~"
+      puts "Info"
+      puts "Type: #{type}"
+      puts "URL: #{url_path}" if url_path
+      puts "Extract path: #{@extract_file}" if @extract_file
+      puts "Extracted file: #{@extract_path}" if @extract_path
+      puts "~~~~~~~~~~~~~~~~~~~~"
+      puts ex.message
+      puts "===================="
+      puts ex.backtrace.join("\n")
+    
+      @success = false
+    ensure
+      p "- Parsing done"
     end
   end
   
