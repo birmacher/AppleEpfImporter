@@ -41,8 +41,6 @@ def print_and_flush(str)
 end
 
 par = AppleEpfImporter::AppleEpfParser.new
-# file_to_parse = '/home/viktorbenei/Dev/AppStream/apple_epf_importer/sampleinput/itunes20121010/application_detail'
-# file_to_parse = '/Users/adminadmin/Dev/AppStream/Code/apple_epf_importer/sampleinput/application_price'
 first_err = nil
 
 time_start = Time.now
