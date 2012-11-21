@@ -16,18 +16,11 @@ module AppleEpfImporter
       end
       close_file
 
-      File.foreach( @filename ) do |line|
+      File.foreach( @filename, @record_separator ) do |line|
         unless line[0].chr == @comment_char
           line = line.chomp( @record_separator )
-          fields = line.split( @field_separator )
-          
-          row_hash = Hash.new
-          fields.each_with_index do |data, index|
-            data_hash = { @header_info[:columns][index] => data }
-            row_hash.merge! ( data_hash )
-          end
-          
-          row.call( row_hash )
+
+          row.call( line.split( @field_separator ) )
         end
       end
       
@@ -102,20 +95,6 @@ module AppleEpfImporter
       @footer_info.merge! ( records_hash )
       @file.rewind
       @footer_info
-    end
-    
-    def load_file_data
-      line = read_line
-      return nil if line.nil?
-      
-      fields = line.split( @field_separator )
-      row = Hash.new
-      fields.each_with_index do |data, index|
-        data_hash = { @header_info[:columns][index] => data }
-        row.merge! ( data_hash )
-      end
-      row
-    end
-    
+    end    
   end
 end
