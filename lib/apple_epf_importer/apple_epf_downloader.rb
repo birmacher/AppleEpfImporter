@@ -12,6 +12,7 @@ module AppleEpfImporter
       p "Download file: #{url}"
       p "Download to: #{download_to}"
       
+      @download_retry = 0
       start_download( url, download_to )
     end
   
@@ -70,10 +71,15 @@ module AppleEpfImporter
           curl.on_body { |data| f << data; }   
           curl.perform
         end
-      rescue Exception => ex
-        # Allow Curl::Err::PartialFileError
-        unless ex.eql? Curl::Err::PartialFileError
-          raise ex
+      rescue Curl::Err::PartialFileError => ex
+        if @download_retry < 3
+          @download_retry += 1
+        
+          p "Curl::Err::PartialFileError happened..."
+          p "Restarting download"
+          start_download( url, filename )
+        else
+          throw ex
         end
       end
     end
