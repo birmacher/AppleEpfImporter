@@ -26,7 +26,7 @@ module AppleEpfImporter
       @apple_id = ''                                                       # Username
       @apple_password = ''                                                 # Password
       @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
-      @itunes_files = [ 'popularity']                                      # Tar prefix to download (itunes, popularity,  ...)
+      @itunes_files = [ 'popularity' ]                                     # Tar prefix to download (itunes, popularity,  ...)
       @extractables = [ [ 'application_popularity_per_genre' ] ]           # Files to extract from the tar
                                                                            # multi-dimensional array if needed
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
@@ -127,6 +127,14 @@ module AppleEpfImporter
       # Download .tbz
       downloader = self.downloader
       url_path = downloader.get_date_file_name( type, file, date )
+      
+      # Nothing to download
+      if url_path.blank?
+        p "Nothing to download"
+        
+        @success = false
+        return
+      end
       
       p "Download file: #{url_path}"
       p "Download started: #{DateTime.now}"
