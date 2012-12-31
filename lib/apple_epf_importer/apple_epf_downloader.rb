@@ -63,6 +63,8 @@ module AppleEpfImporter
     private
     
     def is_file_exists(url)
+      p "Checking file at URL: #{url}"
+      
       uri = URI.parse( url )
       
       request = Net::HTTP::Head.new( url )
