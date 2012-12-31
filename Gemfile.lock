@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    apple_epf_importer (0.7.3)
+    apple_epf_importer (0.7.4)
       curb
       rails (~> 3.2.3)
 
@@ -42,7 +42,7 @@ GEM
     hike (1.2.1)
     i18n (0.6.1)
     journey (1.0.4)
-    json (1.7.5)
+    json (1.7.6)
     mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
