@@ -1,0 +1,20 @@
+<<<<<<< HEAD
+# AppleEpfImporter
+
+## Installation
+
+    gem 'apple_epf_importer'
+
+## Download incremental
+
+    AppleEpfImporter.get_incremental( 'current',
+                                      lambda { |header| puts header },
+                                      lambda { |row| puts row },
+                                      lambda { |success| puts 'Yeah!' if success } )
+
+=======
+AppleEpfImporter
+================
+
+Ruby gem to import Apple's EPF Relational files.
+>>>>>>> 3c50d9c7b5095855d17f2574d4c2ab5a3975a983
