@@ -107,7 +107,10 @@ module AppleEpfImporter
         curl.password = AppleEpfImporter.configuration.apple_password
         
         File.open(filename, 'wb') do |f|
-          curl.on_body { |data| f << data; }   
+          curl.on_body { |data|
+            f << data;
+            data.size
+          }
           curl.perform
         end
       rescue Curl::Err::PartialFileError => ex
