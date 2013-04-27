@@ -28,7 +28,7 @@ module AppleEpfImporter
     def initialize
       @apple_id = ''                                                       # Username
       @apple_password = ''                                                 # Password
-      @itunes_feed_url = 'http://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
+      @itunes_feed_url = 'https://feeds.itunes.apple.com/feeds/epf/v3/full' # Base URL
       @itunes_files = [ 'popularity' ]                                     # Tar prefix to download (itunes, popularity,  ...)
       @extractables = [ [ 'application_popularity_per_genre' ] ]           # Files to extract from the tar
                                                                            # multi-dimensional array if needed
