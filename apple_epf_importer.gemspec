@@ -7,11 +7,11 @@ require "apple_epf_importer/version"
 Gem::Specification.new do |s|
   s.name        = "apple_epf_importer"
   s.version     = AppleEpfImporter::VERSION
-  s.authors     = ["Barnabas Birmacher"]
-  s.email       = ["birmacher@appwhirr.com"]
-  s.homepage    = "http://appwhirr.com"
+  s.authors     = ["Barnabas Birmacher", "Viktor Benei"]
+  s.email       = ["birmacher@gmail.com", "viktorbenei@live.com"]
+  s.homepage    = "http://goappstream.com"
   s.summary     = "Simple importer for Apple's EPF files."
-  s.description = "The gem only imports the selected files, do not store them in the database."
+  s.description = "The gem only imports the selected files, does not store them in the database."
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
