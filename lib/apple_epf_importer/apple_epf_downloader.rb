@@ -67,11 +67,22 @@ module AppleEpfImporter
       p "Checking file at URL: #{url}"
       
       uri = URI.parse( url )
-      
-      request = Net::HTTP::Head.new( url )
-      request.basic_auth( AppleEpfImporter.configuration.apple_id, AppleEpfImporter.configuration.apple_password )
-      
-      response = Net::HTTP.new(uri.host, uri.port).start { |http| http.request( request ) }
+
+      # do a head request
+      http_request = Net::HTTP.new(uri.host, uri.port)
+      # use SSL
+      #  based on: http://stackoverflow.com/questions/8014291/making-http-head-request-with-timeout-in-ruby
+      http_request.use_ssl = true
+      # request.verify_mode = OpenSSL::SSL::VERIFY_NONE # read into this
+      p "starting head request..."
+      response = http_request.start { |http|
+        head_request = Net::HTTP::Head.new( url )
+        head_request.basic_auth( AppleEpfImporter.configuration.apple_id, AppleEpfImporter.configuration.apple_password )
+        
+        http.request( head_request ) 
+      }
+      puts "response: #{response}"
+      puts "response.code: #{response.code}"
       
       ( response.code == "200" )
     end
