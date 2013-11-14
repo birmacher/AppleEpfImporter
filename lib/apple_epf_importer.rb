@@ -157,11 +157,12 @@ module AppleEpfImporter
     begin
       self.setup_directory_for_use
   
+      downloader = self.downloader
+      url_path = downloader.get_date_file_name( type, file, date )
+      
       puts "AppleEpfImporter.configuration.optional_file_to_extract: #{AppleEpfImporter.configuration.optional_file_to_extract}"
       unless AppleEpfImporter.configuration.optional_file_to_extract
         # Download .tbz
-        downloader = self.downloader
-        url_path = downloader.get_date_file_name( type, file, date )
         
         # Nothing to download
         if url_path.blank?
