@@ -24,6 +24,8 @@ module AppleEpfImporter
     attr_accessor :itunes_files
     attr_accessor :extractables
     attr_accessor :extract_dir
+
+    attr_accessor :optional_file_to_extract
     
     def initialize
       @apple_id = ''                                                       # Username
@@ -33,6 +35,9 @@ module AppleEpfImporter
       @extractables = [ [ 'application_popularity_per_genre' ] ]           # Files to extract from the tar
                                                                            # multi-dimensional array if needed
       @extract_dir = [Dir.tmpdir, 'epm_files'].join('/')                   # Will create the directories if not exists
+
+      @optional_file_to_extract = nil #  AppleEpfImporter.configuration.optional_file_to_extract : if specified extract a local file - the file has to be in the extract_dir directory!
+                                      #     useful if the file download is separated, the built-in downloader is quite slow
     end
   end
   
@@ -41,10 +46,12 @@ module AppleEpfImporter
   # header - header block
   # row - row block
   # success - success block
-  def self.get_full_version(date, header, row, success)
+  def self.get_full_version(date, header, row, success, optional_file_to_extract=nil)
     @success = true
     @exception = Array.new
     
+    puts "optional_file_to_extract: #{optional_file_to_extract}"
+    AppleEpfImporter.configuration.optional_file_to_extract = optional_file_to_extract
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
       download( "full", file, index, date, header, row )
       
@@ -59,9 +66,10 @@ module AppleEpfImporter
   # header - header block
   # row - row block
   # success - success block  
-  def self.get_incremental(date, header, row, success)
+  def self.get_incremental(date, header, row, success, optional_file_to_extract=nil)
     @success = true
     
+    AppleEpfImporter.configuration.optional_file_to_extract = optional_file_to_extract
     AppleEpfImporter.configuration.itunes_files.each_with_index do |file, index|
       download( "incremental", file, index, date, header, row )
       
@@ -149,28 +157,34 @@ module AppleEpfImporter
     begin
       self.setup_directory_for_use
   
-      # Download .tbz
-      downloader = self.downloader
-      url_path = downloader.get_date_file_name( type, file, date )
-      
-      # Nothing to download
-      if url_path.blank?
-        p "Nothing to download"
+      puts "AppleEpfImporter.configuration.optional_file_to_extract: #{AppleEpfImporter.configuration.optional_file_to_extract}"
+      unless AppleEpfImporter.configuration.optional_file_to_extract
+        # Download .tbz
+        downloader = self.downloader
+        url_path = downloader.get_date_file_name( type, file, date )
         
-        @success = false
-        return
+        # Nothing to download
+        if url_path.blank?
+          p "Nothing to download"
+          
+          @success = false
+          return
+        end
+        
+        p "Download file: #{url_path}"
+        p "Download started: #{DateTime.now}"
+                
+        downloader.download(url_path)
+
+        # Extract .tbz
+        @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
+        @extract_file = [self.configuration.extract_dir, File.basename( url_path )].join('/')
+      else
+        @extract_path = [self.configuration.extract_dir, File.basename( AppleEpfImporter.configuration.optional_file_to_extract, '.tbz' )].join('/')
+        @extract_file = [self.configuration.extract_dir, AppleEpfImporter.configuration.optional_file_to_extract].join('/')
       end
-      
-      p "Download file: #{url_path}"
-      p "Download started: #{DateTime.now}"
-      
-      downloader.download( url_path)
-      
+
       p "Extract started: #{DateTime.now}"
-      
-      # Extract .tbz
-      @extract_path = [self.configuration.extract_dir, File.basename( url_path, '.tbz' )].join('/')
-      @extract_file = [self.configuration.extract_dir, File.basename( url_path )].join('/')
       
       self.extract( @extract_file )
 
