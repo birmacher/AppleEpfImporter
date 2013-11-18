@@ -223,6 +223,7 @@ module AppleEpfImporter
       puts ex.backtrace.join("\n")
     
       @success = false
+      raise ex
     ensure
       # Delete the used files
       self.delete_directory( @extract_path ) if @extract_path
